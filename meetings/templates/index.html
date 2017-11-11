@@ -7,7 +7,6 @@
      href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css"
 />
 
-
 <link rel="stylesheet" type="text/css"
     href="/static/css/busy.css"
 />
@@ -28,7 +27,6 @@
 
 <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
 <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
-
 
 </head>
 
@@ -88,6 +86,7 @@
     shown in each row (but the order is across then down; I would
     prefer down then across). 
     -->
+
 {% if g.calendars is defined  %}
   <div class="row">
   {% for cal in g.calendars if cal.selected %}
@@ -99,8 +98,7 @@
          {% endif %}
   {% endfor %}
   </div>
-{% endif %}
-    
+{% endif %}   
 
   </div>  <!-- container (for bootstrap) -->
   </body> </html>

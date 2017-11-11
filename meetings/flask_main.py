@@ -12,7 +12,6 @@ import arrow # Replacement for datetime, based on moment.js
 # import datetime # But we still need time
 from dateutil import tz  # For interpreting local times
 
-
 # OAuth2  - Google library implementation for convenience
 from oauth2client import client
 import httplib2   # used in oauth2 flow
@@ -115,7 +114,6 @@ def valid_credentials():
         credentials.access_token_expired):
       return None
     return credentials
-
 
 def get_gcal_service(credentials):
   """
@@ -257,7 +255,6 @@ def interpret_time( text ):
     # FIXME: Remove the workaround when arrow is fixed (but only after testing
     # on raspberry Pi --- failure is likely due to 32-bit integers on that platform)
 
-
 def interpret_date( text ):
     """
     Convert text of date to ISO format used internally,
@@ -317,7 +314,6 @@ def list_calendars(service):
             })
     return sorted(result, key=cal_sort_key)
 
-
 def cal_sort_key( cal ):
     """
     Sort key for the list of calendars:  primary calendar first,
@@ -333,7 +329,6 @@ def cal_sort_key( cal ):
     else:
        primary_key = "X"
     return (primary_key, selected_key, cal["summary"])
-
 
 #################
 #
@@ -359,10 +354,8 @@ def format_arrow_time( time ):
     
 #############
 
-
 if __name__ == "__main__":
   # App is created above so that it will
   # exist whether this is 'main' or not
   # (e.g., if we are running under green unicorn)
   app.run(port=CONFIG.PORT,host="0.0.0.0")
-    

@@ -83,30 +83,51 @@
     });
   </script>
 
-<br /><input type="submit" value="Choose" />
+<br />
+{% if g.calendars is not defined %}
+<input type="submit" value="Choose" />
+{% endif %}
 </form>
 
     <!--
-    Show the calendar list (if we have it). FIXME: This will need to be turned into
-    a form from which calendars can be picked. Up to three entries are
-    shown in each row (but the order is across then down; I would
-    prefer down then across). 
+    Show the calendar list (if we have it). This is a form from which calendars 
+    can be picked. Up to three entries are
+    shown in each row. 
     -->
 
-{% if g.calendars is defined  %}
+<form method="post"> <!-- FIXME: put in a form action to reroute when the checked calendars have been submitted -->
+{% if g.calendars is defined %}
   <div class="row">
   {% for cal in g.calendars if cal.selected %}
           <div class="col-md-4">
-	   {{ cal.summary }}
+            <!-- add check box to cal.summary, cal.desc -->
+     <form action="" method="post">
+     <input type="checkbox" name="calendar" value="{{ cal.summary }}" /> {{ cal.summary }} : {{ cal.desc }} <br />
           </div>
          {% if loop.index is divisibleby 3 %}
           </div> <div class="row">
          {% endif %}
   {% endfor %}
+  <br /><input type="submit" value="Submit" />
   </div>
-{% endif %}   
+{% endif %}
+</form> 
 
-<!-- Display busy times for each calendar if calendar was selected -->
+{% if g.calendars is defined %}
+  {% if g.cal_list is defined %}
+  <!-- FIXME: I do not have g.cal_list defined -->
+    {% for cal in g.calendars if cal.selected %}
+          <div class="col-md-4">
+            {{ cal.events }}
+            <!-- FIXME: I do not have cal. events defined yet, AND need to display only busy events -->
+          </div>
+         {% if loop.index is divisibleby 3 %}
+          </div> <div class="row">
+         {% endif %}
+    {% endfor %}
+  <!-- Display busy times for each calendar if calendar was selected -->
+  {% endif %}}
+{% endif %}
 
   </div>  <!-- container (for bootstrap) -->
   </body> </html>

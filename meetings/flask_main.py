@@ -48,7 +48,7 @@ APPLICATION_NAME = 'MeetMe class project'
 def index():
   app.logger.debug("Entering index")
   init_session_values()
-  if 'begin_date' not in flask.session:
+  if 'begin_date' not in flask.session: # FIXME: Delete me?
     init_session_values()
   return render_template('index.html')
 
@@ -191,7 +191,7 @@ def setrange():
     widget.
     """
     app.logger.debug("Entering setrange")  
-    flask.flash("Set range gave us '{}'".format(
+    flask.flash("Set range: '{}'".format(
       request.form.get('daterange')))
     daterange = request.form.get('daterange')
     timerange = request.form.get('timerange')
@@ -316,10 +316,12 @@ def list_calendars(service):
         selected = ("selected" in cal) and cal["selected"]
         primary = ("primary" in cal) and cal["primary"]
         
+        # FIXME: add in events
 
         result.append(
           { "kind": kind,
             "id": id,
+            "desc": desc,
             "summary": summary,
             "selected": selected,
             "primary": primary

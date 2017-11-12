@@ -47,6 +47,7 @@ APPLICATION_NAME = 'MeetMe class project'
 @app.route("/index")
 def index():
   app.logger.debug("Entering index")
+  init_session_values()
   if 'begin_date' not in flask.session:
     init_session_values()
   return render_template('index.html')
@@ -190,13 +191,22 @@ def setrange():
     widget.
     """
     app.logger.debug("Entering setrange")  
-    flask.flash("Setrange gave us '{}'".format(
+    flask.flash("Set range gave us '{}'".format(
       request.form.get('daterange')))
     daterange = request.form.get('daterange')
+    timerange = request.form.get('timerange')
+
     flask.session['daterange'] = daterange
+    flask.session['timerange'] = timerange
+
     daterange_parts = daterange.split()
     flask.session['begin_date'] = interpret_date(daterange_parts[0])
     flask.session['end_date'] = interpret_date(daterange_parts[2])
+
+    timerange_parts = timerange.split()
+    flask.session['begin_time'] = interpret_time(timerange_parts[0])
+    flask.session['end_time'] = interpret_time(timerange_parts[2])
+
     app.logger.debug("Setrange parsed {} - {}  dates as {} - {}".format(
       daterange_parts[0], daterange_parts[1], 
       flask.session['begin_date'], flask.session['end_date']))
@@ -225,6 +235,8 @@ def init_session_values():
     # Default time span each day, 8 to 5
     flask.session["begin_time"] = interpret_time("9am")
     flask.session["end_time"] = interpret_time("5pm")
+    flask.session["timerange"] = "{} - {}".format(format_arrow_time(flask.session["begin_time"]),
+     format_arrow_time(flask.session["end_time"]))
 
 def interpret_time( text ):
     """

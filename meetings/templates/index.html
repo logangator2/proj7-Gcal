@@ -51,8 +51,14 @@
   {% endif %}
 {% endwith %}
 
-<h2>Date range</h2>
+<h2>Time/Date range</h2>
   <form action="/setrange" method="post">
+  <input type="text" name="timerange" size="12"
+    {% if session.timerange is defined %}
+         value="{{session.timerange}}"
+    {% endif %}
+     style="background: #fff; cursor: pointer; padding: 5px 10px;
+     border: 1px solid #ccc; width: 12em" >
   <input type="text" name="daterange" size="12"
     {% if session.daterange is defined %}
          value="{{session.daterange}}"
@@ -81,7 +87,7 @@
 </form>
 
     <!--
-    Show the calendar list (if we have it).  This will need to be turned into
+    Show the calendar list (if we have it). FIXME: This will need to be turned into
     a form from which calendars can be picked. Up to three entries are
     shown in each row (but the order is across then down; I would
     prefer down then across). 
@@ -99,6 +105,8 @@
   {% endfor %}
   </div>
 {% endif %}   
+
+<!-- Display busy times for each calendar if calendar was selected -->
 
   </div>  <!-- container (for bootstrap) -->
   </body> </html>

@@ -20,5 +20,6 @@ for some subset of them.
 You'll need to read the Google developer documentation to learn how to
 obtain information from the Google Calendar service.
 
+## Credits
 
-
+- Google API documentation and examples

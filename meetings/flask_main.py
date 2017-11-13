@@ -48,8 +48,6 @@ APPLICATION_NAME = 'MeetMe class project'
 def index():
   app.logger.debug("Entering index")
   init_session_values()
-  if 'begin_date' not in flask.session: # FIXME: Delete me?
-    init_session_values()
   return render_template('index.html')
 
 @app.route("/choose")
@@ -68,6 +66,20 @@ def choose():
     app.logger.debug("Returned from get_gcal_service")
     flask.g.calendars = list_calendars(gcal_service)
     return render_template('index.html')
+
+@app.route("/display", methods=['POST'])
+def display():
+  """
+  Uses repeated code from choose to keep info about 
+  """
+  credentials = valid_credentials()
+  if not credentials:
+    return flask.redirect(flask.url_for('oauth2callback'))
+  gcal_service = get_gcal_service(credentials)
+  flask.g.calendars = list_calendars(gcal_service)
+
+  flask.g.checked = request.form.getlist("calendarcheck")
+  return render_template('index.html')
 
 ####
 #
@@ -237,6 +249,7 @@ def init_session_values():
     flask.session["end_time"] = interpret_time("5pm")
     flask.session["timerange"] = "{} - {}".format(format_arrow_time(flask.session["begin_time"]),
      format_arrow_time(flask.session["end_time"]))
+    return
 
 def interpret_time( text ):
     """
@@ -326,6 +339,7 @@ def list_calendars(service):
             "selected": selected,
             "primary": primary
             })
+        #logging.info(result) # FIXME: remove after testing
     return sorted(result, key=cal_sort_key)
 
 def cal_sort_key( cal ):

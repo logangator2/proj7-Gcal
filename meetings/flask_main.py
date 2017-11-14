@@ -70,15 +70,63 @@ def choose():
 @app.route("/display", methods=['POST'])
 def display():
   """
-  Uses repeated code from choose to keep info about 
+  Displays busy time events
   """
+  # For comparison
+  daterange = flask.session['daterange']
+  timerange = flask.session['timerange']
+
+  daterange_parts = daterange.split()
+  begin_date = interpret_date(daterange_parts[0])
+  end_date = interpret_date(daterange_parts[2])
+
+  timerange_parts = timerange.split()
+  begin_time = interpret_time(timerange_parts[0])
+  end_time = interpret_time(timerange_parts[2])
+
+  # Getting Google credentials
   credentials = valid_credentials()
   if not credentials:
     return flask.redirect(flask.url_for('oauth2callback'))
   gcal_service = get_gcal_service(credentials)
   flask.g.calendars = list_calendars(gcal_service)
 
+  # Begins to add events to list based on checked calendars
   flask.g.checked = request.form.getlist("calendarcheck")
+  busy_list = []
+  for calendar in flask.g.checked:
+    for cal in flask.g.calendars:
+      if calendar == cal['summary']:
+        calendar = cal
+    # obtain calendar id for that calendar's events
+    cal_id = calendar['id']
+
+    # obtain events for that calendar
+    now = arrow.now('local')
+    eventsResult = gcal_service.events().list(
+        calendarId=cal_id, timeMin=now, maxResults=10, singleEvents=True,
+        orderBy='startTime').execute()
+    events = eventsResult.get('items', [])
+
+    # putting each busy event into busy list
+    for event in events:
+      if event.get("transparency") == None:
+        summary = event['summary']
+        desc = event.get('description', "No description.")
+        start = event.get('start')
+        start_time = start.get('dateTime')
+        end = event.get('end')
+        end_time = end.get('dateTime')
+
+        if start_time != None and end_time != None:
+          #if start_time < x or end_time > y: # x, y come from input times
+            busy_list.append(
+                  { 'summary': summary,
+                    "desc": desc,
+                    "start_time": start_time,
+                    "end_time": end_time
+                    })
+  flask.g.events = busy_list # all events from all calendars
   return render_template('index.html')
 
 ####
@@ -328,8 +376,6 @@ def list_calendars(service):
         # Optional binary attributes with False as default
         selected = ("selected" in cal) and cal["selected"]
         primary = ("primary" in cal) and cal["primary"]
-        
-        # FIXME: add in events
 
         result.append(
           { "kind": kind,
@@ -339,7 +385,6 @@ def list_calendars(service):
             "selected": selected,
             "primary": primary
             })
-        #logging.info(result) # FIXME: remove after testing
     return sorted(result, key=cal_sort_key)
 
 def cal_sort_key( cal ):

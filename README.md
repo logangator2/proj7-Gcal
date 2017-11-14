@@ -15,11 +15,7 @@ calendar) and list 'blocking'  (non-transparent)
 appointments between a start date and an end date
 for some subset of them.
 
-## What you'll add
-
-You'll need to read the Google developer documentation to learn how to
-obtain information from the Google Calendar service.
-
 ## Credits
 
 - Google API documentation and examples
+- Former project code

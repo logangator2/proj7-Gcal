@@ -19,6 +19,9 @@ import httplib2   # used in oauth2 flow
 # Google API for services 
 from apiclient import discovery
 
+# My Timeblock class
+#import timeblock
+
 ###
 # Globals
 ###
@@ -75,14 +78,12 @@ def display():
   # For comparison
   daterange = flask.session['daterange']
   timerange = flask.session['timerange']
+  ar_dict = cleanup(timerange, daterange)
 
-  daterange_parts = daterange.split()
-  begin_date = interpret_date(daterange_parts[0])
-  end_date = interpret_date(daterange_parts[2])
-
-  timerange_parts = timerange.split()
-  begin_time = interpret_time(timerange_parts[0])
-  end_time = interpret_time(timerange_parts[2])
+  """
+  {'begin_time': <Arrow [2016-01-01T09:00:00-08:00]>, 'end_time': <Arrow [2016-01-01T17:00:00-08:00]>, 
+  'begin_date': <Arrow [2017-11-17T00:00:00-08:00]>, 'end_date': <Arrow [2017-11-23T00:00:00-08:00]>}
+  """
 
   # Getting Google credentials
   credentials = valid_credentials()
@@ -119,14 +120,17 @@ def display():
         end_time = end.get('dateTime')
 
         if start_time != None and end_time != None:
-          #if start_time < x or end_time > y: # x, y come from input times
+          #if start_time < ar_dict["begin_time"] or end_time > ar_dict["end_time"]:
             busy_list.append(
                   { 'summary': summary,
                     "desc": desc,
                     "start_time": start_time,
                     "end_time": end_time
                     })
+  # After collecting all of the busy_times, then do the calc for if they're in the right time
+  # Then, make every event a timeblock object
   flask.g.events = busy_list # all events from all calendars
+  # flask.g.free = free_list
   return render_template('index.html')
 
 ####
@@ -353,6 +357,39 @@ def next_day(isotext):
 #  Functions (NOT pages) that return some information
 #
 ####
+
+def cleanup(timerange, daterange):
+  """
+  Turns the time range and daterange into arrow objects
+  Args:
+    timerange: range of times selected by the user
+    daterange: range of dates selected by the user
+  Returns:
+    ar_dict: a dictionary of arrow objects consisting of start and end
+    date, and start and end time
+  """
+  # Grab each individual string
+  timerange_parts = timerange.split()
+  begin_time = interpret_time(timerange_parts[0])
+  end_time = interpret_time(timerange_parts[2])
+  daterange_parts = daterange.split()
+  begin_date = interpret_date(daterange_parts[0])
+  end_date = interpret_date(daterange_parts[2])
+
+  # Turn each string into an arrow object
+  begin_time = arrow.get(begin_time)
+  end_time = arrow.get(end_time)
+  begin_date = arrow.get(begin_date)
+  end_date = arrow.get(end_date)
+
+  # Add each arrow object to the dictionary
+  ar_dict = {
+      "begin_time": begin_time,
+      "end_time": end_time,
+      "begin_date": begin_date,
+      "end_date": end_date
+    }
+  return ar_dict
   
 def list_calendars(service):
     """

@@ -4,7 +4,6 @@ class Timeblock:
   """
   A class that defines a block of time in arrow objects
   """
-
   def __init__(self, name, begin, end):
     """
     Args:

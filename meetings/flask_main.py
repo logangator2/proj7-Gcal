@@ -78,59 +78,60 @@ def display():
   # For comparison
   daterange = flask.session['daterange']
   timerange = flask.session['timerange']
-  ar_dict = cleanup(timerange, daterange)
+  ar_dict = arrowizer(timerange, daterange)
+  # ar_dict = "begin_date": "2017-11-18T09:00:00-08:00", "end_date": "2017-11-24T17:00:00-08:00"
 
-  """
-  {'begin_time': <Arrow [2016-01-01T09:00:00-08:00]>, 'end_time': <Arrow [2016-01-01T17:00:00-08:00]>, 
-  'begin_date': <Arrow [2017-11-17T00:00:00-08:00]>, 'end_date': <Arrow [2017-11-23T00:00:00-08:00]>}
-  """
-
-  # Getting Google credentials
+  # Getting Google credentials and calendar
   credentials = valid_credentials()
   if not credentials:
     return flask.redirect(flask.url_for('oauth2callback'))
   gcal_service = get_gcal_service(credentials)
   flask.g.calendars = list_calendars(gcal_service)
 
-  # Begins to add events to list based on checked calendars
+  # Grabs events in selected calendars
   flask.g.checked = request.form.getlist("calendarcheck")
+
+  # Algorith for displayign results
   busy_list = []
   for calendar in flask.g.checked:
     for cal in flask.g.calendars:
       if calendar == cal['summary']:
         calendar = cal
-    # obtain calendar id for that calendar's events
+    # Obtain calendar id for that calendar's events
     cal_id = calendar['id']
 
-    # obtain events for that calendar
-    now = arrow.now('local')
+    # Obtain events for that calendar
+    starter = ar_dict["begin_date"]
+    ender = ar_dict["end_date"]
     eventsResult = gcal_service.events().list(
-        calendarId=cal_id, timeMin=now, maxResults=10, singleEvents=True,
+        calendarId=cal_id, timeMin=starter, timeMax=ender, maxResults=10, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
-    # putting each busy event into busy list
+    # Put each busy event into busy list
     for event in events:
       if event.get("transparency") == None:
         summary = event['summary']
         desc = event.get('description', "No description.")
+        # Double checks for None values for times
         start = event.get('start')
-        start_time = start.get('dateTime')
+        start = start.get('dateTime')
         end = event.get('end')
-        end_time = end.get('dateTime')
+        end = end.get('dateTime')
 
-        if start_time != None and end_time != None:
-          #if start_time < ar_dict["begin_time"] or end_time > ar_dict["end_time"]:
+        # Checks that the event is within the date/time constraints and is not None
+        if start != None and end != None:
             busy_list.append(
-                  { 'summary': summary,
-                    "desc": desc,
-                    "start_time": start_time,
-                    "end_time": end_time
+                  { "Calendar": calendar['summary'],
+                    'Summary': summary,
+                    "Description": desc,
+                    "Start Time": start,
+                    "End Time": end
                     })
-  # After collecting all of the busy_times, then do the calc for if they're in the right time
-  # Then, make every event a timeblock object
-  flask.g.events = busy_list # all events from all calendars
-  # flask.g.free = free_list
+  busy_list = within_time(busy_list, ar_dict["begin_date"], ar_dict["end_date"])
+  free_list = freemaker(busy_list, ar_dict["begin_date"], ar_dict["end_date"])
+  flask.g.events = busy_list # busy times within datetime range
+  flask.g.free = free_list # free times within datetime range
   return render_template('index.html')
 
 ####
@@ -297,10 +298,14 @@ def init_session_values():
         tomorrow.format("MM/DD/YYYY"),
         nextweek.format("MM/DD/YYYY"))
     # Default time span each day, 8 to 5
-    flask.session["begin_time"] = interpret_time("9am")
-    flask.session["end_time"] = interpret_time("5pm")
-    flask.session["timerange"] = "{} - {}".format(format_arrow_time(flask.session["begin_time"]),
-     format_arrow_time(flask.session["end_time"]))
+    nine_am = now.replace(hour=9, minute=0)
+    five_pm = now.replace(hour=17, minute=0)
+    flask.session["begin_time"] = nine_am.isoformat()
+    flask.session["end_time"] = five_pm.isoformat()
+    flask.session["timerange"] = "{} - {}".format(
+        nine_am.format("HH:mm"),
+        five_pm.format("HH:mm"))
+    #logging.info(nine_am)
     return
 
 def interpret_time( text ):
@@ -358,34 +363,75 @@ def next_day(isotext):
 #
 ####
 
-def cleanup(timerange, daterange):
+def freemaker(busy_list, begin, end):
   """
-  Turns the time range and daterange into arrow objects
+  Takes a list of busy times and checks to see if they are within the proper time range
+  Args:
+    busy_list: a list of busy events within a datetime range (with overlapping in/out of dates)
+    begin: start datetime of daterange
+    end: end datetime of daterange
+  Returns:
+    free_list: list that has free blocks in datetime range
+  """
+  free_list = []
+  return free_list
+
+def within_time(busy_list, begin, end):
+  """
+  Takes a list of busy times and checks to see if they are within the proper time range
+  Args:
+    busy_list: a list of busy events within a date range (with overlapping in/out of dates)
+    begin: start datetime of daterange
+    end: end datetime of daterange
+  Returns:
+    busy_list: updated list that has events that are only in datetime range
+  """
+  # start_time arrow object
+  # end_time arrow object
+
+  new_busy_list = []
+  #for event in busy_list:
+    # if event["End Time"] end is before start_time
+    # if event["Start Time"] begin is after end_time
+    # else: new_busy_list.append(event)
+  #busy_list = new_busy_list
+  return busy_list
+
+def arrowizer(timerange, daterange):
+  """
+  Turns the timerange and daterange into arrow objects
   Args:
     timerange: range of times selected by the user
     daterange: range of dates selected by the user
   Returns:
     ar_dict: a dictionary of arrow objects consisting of start and end
-    date, and start and end time
+    datetime
   """
-  # Grab each individual string
+  # Grab time values for date modification
   timerange_parts = timerange.split()
-  begin_time = interpret_time(timerange_parts[0])
-  end_time = interpret_time(timerange_parts[2])
+  begin_time = timerange_parts[0]
+  end_time = timerange_parts[2]
+  begin_hour = int(begin_time[:2])
+  end_hour = int(end_time[:2])
+  begin_minute = int(begin_time[3:])
+  end_minute = int(end_time[3:])
+
+  # Grab date values
   daterange_parts = daterange.split()
   begin_date = interpret_date(daterange_parts[0])
   end_date = interpret_date(daterange_parts[2])
 
-  # Turn each string into an arrow object
-  begin_time = arrow.get(begin_time)
-  end_time = arrow.get(end_time)
+  # Turn each string into an arrow object, then replace with 
   begin_date = arrow.get(begin_date)
+  begin_date = begin_date.replace(hour=begin_hour, minute=begin_minute)
   end_date = arrow.get(end_date)
+  end_date = end_date.replace(hour=end_hour, minute=end_minute)
+
+  logging.info("Begin date: {}".format(begin_date))
+  logging.info("End date: {}".format(end_date))
 
   # Add each arrow object to the dictionary
   ar_dict = {
-      "begin_time": begin_time,
-      "end_time": end_time,
       "begin_date": begin_date,
       "end_date": end_date
     }

@@ -305,7 +305,6 @@ def init_session_values():
     flask.session["timerange"] = "{} - {}".format(
         nine_am.format("HH:mm"),
         five_pm.format("HH:mm"))
-    #logging.info(nine_am)
     return
 
 def interpret_time( text ):
@@ -374,6 +373,9 @@ def freemaker(busy_list, begin, end):
     free_list: list that has free blocks in datetime range
   """
   free_list = []
+  # I have an availability timeblock for each day, 
+  #and I subtract each busy event timeblock on that day from that availability 
+
   return free_list
 
 def within_time(busy_list, begin, end):
@@ -386,15 +388,22 @@ def within_time(busy_list, begin, end):
   Returns:
     busy_list: updated list that has events that are only in datetime range
   """
-  # start_time arrow object
-  # end_time arrow object
+  # start_time datetime object
+  begin_time = begin.time()
+  # end_time datetime object
+  end_time = end.time()
 
-  new_busy_list = []
-  #for event in busy_list:
-    # if event["End Time"] end is before start_time
-    # if event["Start Time"] begin is after end_time
-    # else: new_busy_list.append(event)
-  #busy_list = new_busy_list
+  for event in busy_list:
+    ending = arrow.get(event["End Time"])
+    ending = ending.time()
+    beginning = arrow.get(event["Start Time"])
+    beginning = beginning.time()
+    # Compare datetime for lack of overlap
+    if ending < begin_time:
+      busy_list.remove(event)
+    if beginning > end_time:
+      busy_list.remove(event)
+    # else keep the event in the list
   return busy_list
 
 def arrowizer(timerange, daterange):
@@ -426,9 +435,6 @@ def arrowizer(timerange, daterange):
   begin_date = begin_date.replace(hour=begin_hour, minute=begin_minute)
   end_date = arrow.get(end_date)
   end_date = end_date.replace(hour=end_hour, minute=end_minute)
-
-  logging.info("Begin date: {}".format(begin_date))
-  logging.info("End date: {}".format(end_date))
 
   # Add each arrow object to the dictionary
   ar_dict = {

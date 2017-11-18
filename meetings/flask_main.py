@@ -19,8 +19,9 @@ import httplib2   # used in oauth2 flow
 # Google API for services 
 from apiclient import discovery
 
-# My Timeblock class
-#import timeblock
+# My modules
+import timeblock
+from free import freemaker
 
 ###
 # Globals
@@ -79,7 +80,7 @@ def display():
   daterange = flask.session['daterange']
   timerange = flask.session['timerange']
   ar_dict = arrowizer(timerange, daterange)
-  # ar_dict = "begin_date": "2017-11-18T09:00:00-08:00", "end_date": "2017-11-24T17:00:00-08:00"
+  # FIXME: ar_dict = "begin_date": "2017-11-18T09:00:00-08:00", "end_date": "2017-11-24T17:00:00-08:00"
 
   # Getting Google credentials and calendar
   credentials = valid_credentials()
@@ -361,22 +362,6 @@ def next_day(isotext):
 #  Functions (NOT pages) that return some information
 #
 ####
-
-def freemaker(busy_list, begin, end):
-  """
-  Takes a list of busy times and checks to see if they are within the proper time range
-  Args:
-    busy_list: a list of busy events within a datetime range (with overlapping in/out of dates)
-    begin: start datetime of daterange
-    end: end datetime of daterange
-  Returns:
-    free_list: list that has free blocks in datetime range
-  """
-  free_list = []
-  # I have an availability timeblock for each day, 
-  #and I subtract each busy event timeblock on that day from that availability 
-
-  return free_list
 
 def within_time(busy_list, begin, end):
   """

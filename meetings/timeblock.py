@@ -4,25 +4,20 @@ class Timeblock:
   """
   A class that defines a block of time in arrow objects
   """
-  def __init__(self, name, begin, end):
+  def __init__(self, name, start, end):
     """
-    Args:
-      name: str, the summary of an event
-      begin: an ISO datetime string
-      end: an ISO datetime string
+    Values:
+      name: str, the summary of an event, used for identification
+      begin: start datetime
+      end: end datetime
     """
     self.name = name
-    self.begin = begin
-    self.end = end
-
-  def arrowize(datetime):
-    """
-    Turns datetime strings into date arrow objects and time arrow objects
-    Args:
-      datetime: a datetime string, likely to be begin or end
-    Returns:
-
-    """
-    date = arrow.get(datetime)
-    time = arrow.get(datetime)
+    self.start = arrow.get(start)
+    self.end = arrow.get(end)
+    self.start_time = self.start.time()
+    self.end_time = self.end.time()
+    self.start_date = self.start.date()
+    self.end_date = self.end.date()
+    
+  def x(self):
     return

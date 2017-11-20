@@ -12,24 +12,14 @@ def freemaker(busy_list, begin, end):
   Returns:
     free_list: list with free blocks in datetime range
   """
-  free_list = []
   busy_tb_list = []
   for event in busy_list:
   	event_tb = timeblock.Timeblock(event["Summary"], event["Start Time"], event["End Time"])
   	busy_tb_list.append(event_tb)
 
   # List of available timeblocks
-  availability = convert_datetime(begin, end)
+  free_list = convert_datetime(begin, end)
 
-  free_list = availability # FIXME: Delete this line when ready to test freemaker functionality
-  """
-  self.start = arrow.get(start) datetime str
-    self.end = arrow.get(end) datetime str
-    self.start_time = self.start.time()
-    self.end_time = self.end.time()
-    self.start_date = self.start.date()
-    self.end_date = self.end.date()
-    """
   for etb in busy_tb_list:
     new_free_tbs = []
     for atb in free_list:
@@ -40,8 +30,16 @@ def freemaker(busy_list, begin, end):
           new_free_tbs.append(atb) # no overlap
         else: #if times overlap
           tb1, tb2 = atb.split(etb)
-          new_free_tbs.append(tb1)
-          new_free_tbs.append(tb2)
+          # Checks to make sure that start time isn't equal or greater than the end time
+          if tb1.start_time >= tb1.end_time and tb2.start_time >= tb2.end_time:
+            continue
+          if tb2.start_time >= tb2.end_time:
+            new_free_tbs.append(tb1)
+          if tb1.start_time >= tb1.end_time:
+            new_free_tbs.append(tb2)
+          elif tb1.start_time < tb1.end_time and tb2.start_time < tb2.end_time:
+            new_free_tbs.append(tb1)
+            new_free_tbs.append(tb2)
       else:
         new_free_tbs.append(atb) # if no overlap
     free_list = new_free_tbs

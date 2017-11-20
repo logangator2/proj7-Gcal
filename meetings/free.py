@@ -29,21 +29,23 @@ def freemaker(busy_list, begin, end):
     self.end_time = self.end.time()
     self.start_date = self.start.date()
     self.end_date = self.end.date()
-    
+    """
   for etb in busy_tb_list:
     new_free_tbs = []
     for atb in free_list:
       if atb.start_date == etb.start_date or atb.end_date == etb.end_date: # if dates are the same
         if etb.start_time < atb.start_time and etb.end_time > atb.end_time: # etb has a wider time range than atb
             continue # go to the next atb, do not add to new_free_tbs
-        # if times overlap
-          atb.split(etb) 
-        else: # if no overlap
-          new_free_tbs.append(atb)
+        if etb.start_time >= atb.end_time or etb.end_time <= atb.start_time:
+          new_free_tbs.append(atb) # no overlap
+        else: #if times overlap
+          tb1, tb2 = atb.split(etb)
+          new_free_tbs.append(tb1)
+          new_free_tbs.append(tb2)
       else:
         new_free_tbs.append(atb) # if no overlap
     free_list = new_free_tbs
-"""
+
   return free_list
 
 def convert_datetime(begin, end):

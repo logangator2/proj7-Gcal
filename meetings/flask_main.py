@@ -80,7 +80,7 @@ def display():
   daterange = flask.session['daterange']
   timerange = flask.session['timerange']
   ar_dict = arrowizer(timerange, daterange)
-  # FIXME: ar_dict = "begin_date": "2017-11-18T09:00:00-08:00", "end_date": "2017-11-24T17:00:00-08:00"
+  # Example: ar_dict = "begin_date": "2017-11-18T09:00:00-08:00", "end_date": "2017-11-24T17:00:00-08:00"
 
   # Getting Google credentials and calendar
   credentials = valid_credentials()

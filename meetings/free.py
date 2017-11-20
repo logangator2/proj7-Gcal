@@ -6,11 +6,11 @@ def freemaker(busy_list, begin, end):
   """
   Takes a list of busy times and checks to see if they are within the proper time range
   Args:
-    busy_list: a list of busy events within a datetime range (with overlapping in/out of dates)
+    busy_list: a list of busy dictionary events within a datetime range (with overlapping in/out of dates)
     begin: start datetime of daterange
     end: end datetime of daterange
   Returns:
-    free_list: list that has free blocks in datetime range
+    free_list: list with free blocks in datetime range
   """
   free_list = []
   busy_tb_list = []
@@ -21,6 +21,29 @@ def freemaker(busy_list, begin, end):
   # List of available timeblocks
   availability = convert_datetime(begin, end)
 
+  free_list = availability # FIXME: Delete this line when ready to test freemaker functionality
+  """
+  self.start = arrow.get(start) datetime str
+    self.end = arrow.get(end) datetime str
+    self.start_time = self.start.time()
+    self.end_time = self.end.time()
+    self.start_date = self.start.date()
+    self.end_date = self.end.date()
+    
+  for etb in busy_tb_list:
+    new_free_tbs = []
+    for atb in free_list:
+      if atb.start_date == etb.start_date or atb.end_date == etb.end_date: # if dates are the same
+        if etb.start_time < atb.start_time and etb.end_time > atb.end_time: # etb has a wider time range than atb
+            continue # go to the next atb, do not add to new_free_tbs
+        # if times overlap
+          atb.split(etb) 
+        else: # if no overlap
+          new_free_tbs.append(atb)
+      else:
+        new_free_tbs.append(atb) # if no overlap
+    free_list = new_free_tbs
+"""
   return free_list
 
 def convert_datetime(begin, end):

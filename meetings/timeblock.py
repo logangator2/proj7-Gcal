@@ -19,5 +19,21 @@ class Timeblock:
     self.start_date = self.start.date()
     self.end_date = self.end.date()
     
+  def __str__(self):
+    # String representation
+    return "{}: Start Time: {}, End Time: {}".format(self.name, self.start, self.end)
+
+  def split(self, tb):
+    """
+    Splits a timeblock in two based off of another timeblock's start and end time.
+    Args:
+      tb: another timeblock on the same day as self, and with a smaller time range
+    Returns:
+      Two timeblocks, one up to the start time of tb, and one that starts at the end time of tb
+    """
+    tb1 = Timeblock(self.name + ".1", self.start, tb.start)
+    tb2 = Timeblock(self.name + ".2", tb.end, self.end)
+    return tb1, tb2
+
   def x(self):
     return

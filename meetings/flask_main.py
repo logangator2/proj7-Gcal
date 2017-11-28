@@ -71,6 +71,17 @@ def choose():
     flask.g.calendars = list_calendars(gcal_service)
     return render_template('index.html')
 
+@app.route("/invitation")
+def invitation():
+
+  return render_template('invitation.html')
+
+"""
+@app.route("/invitation/<token>")
+def x(token):
+  return 
+"""
+
 @app.route("/display", methods=['POST'])
 def display():
   """

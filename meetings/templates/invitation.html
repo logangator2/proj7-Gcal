@@ -17,8 +17,22 @@
 
 <h1>Meeting Invitation</h1>
 
-<p></p>
-<!-- look at hidden for advice on how to get data from one page to another -->
+<h2>Selected Free Times:</h2>
+{% for freeblock in g.freeblocks %}
+    {{ freeblock }} <br/> <br/>
+{% endfor %}
+
+<!-- select how many ppl to invite, then bring up textboxes to enter names -->
+
+<!-- <form action="/invitation" method="post"> -->
+  <!-- <input type="text" name="name"> -->
+<!-- </form> -->
+
+<form action="/display" method="post">
+<input type="submit" value="Cancel"/>
+</form>
+
+<!-- if g.x is defined, display top marks for meetings + warning to user that they may need to refresh the page to see results -->
 
 </body>
 </html>

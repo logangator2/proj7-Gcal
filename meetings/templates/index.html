@@ -118,11 +118,12 @@
     {{ event }} <br/> <br/>
   {% endfor %}
   Free Times: <br/> <br/>
-  <form action="/invitation" name="freeblocks">
+  <form action="/invitation" name="freeblocks" method="POST">
   {% for event in g.free %}
     <input type="checkbox" name="freeblocks" value="{{ event }}" /> {{ event }} <br/> <br/>
   {% endfor %}
   <input type="submit" value="Invite" />
+  <input type="hidden" name="invite" value="invitation.html"></input>
   </form>
 {% endif %}
 

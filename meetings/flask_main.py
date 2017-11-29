@@ -71,10 +71,11 @@ def choose():
     flask.g.calendars = list_calendars(gcal_service)
     return render_template('index.html')
 
-@app.route("/invitation")
+@app.route("/invitation", methods=["POST"])
 def invitation():
-
-  return render_template('invitation.html')
+  flask.g.freeblocks = request.form.getlist("freeblocks")
+  invitation = flask.request.form.get("invite")
+  return render_template(invitation)
 
 """
 @app.route("/invitation/<token>")

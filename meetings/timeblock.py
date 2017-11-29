@@ -21,7 +21,8 @@ class Timeblock:
     
   def __str__(self):
     # String representation
-    return "{}: Start Time: {}, End Time: {}".format(self.name, self.start, self.end)
+    return "{}: Start Time: {}, End Time: {}, Start Date: {}, End Date: {}".format(self.name, 
+      self.start_time, self.end_time, self.start_date, self.end_date)
 
   def split(self, tb):
     """

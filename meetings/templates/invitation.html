@@ -22,14 +22,37 @@
     {{ freeblock }} <br/> <br/>
 {% endfor %}
 
-<!-- select how many ppl to invite, then bring up textboxes to enter names -->
+<!-- Select how many ppl to invite, then bring up textboxes to enter names -->
+<form action="/invitation" method="post">
+  Enter the number of people you wish to invite: 
+  <select name="invite_num" value=1>
+    <option value=1>1</option>
+    <option value=2>2</option>
+    <option value=3>3</option>
+    <option value=4>4</option>
+    <option value=5>5</option>
+    <option value=6>6</option>
+    <option value=7>7</option>
+    <option value=8>8</option>
+    <option value=9>9</option>
+    <option value=10>10</option>
+  </select>
+  <!-- <input type="text" name="invite_num" value="0"> -->
+  <input type="submit" value="Submit"/>
 
-<!-- <form action="/invitation" method="post"> -->
-  <!-- <input type="text" name="name"> -->
-<!-- </form> -->
+  <!-- Hidden field from index.html, used for refreshing page -->
+<input type="hidden" name="invite" value="{{ g.invitation }}"></input>
+</form>
+
+{% if g.invite_num is number %}
+  Please enter a name for each person you would like to invite. <br/> <br/>
+  {% for i in range(g.invite_num) %}
+    Enter a name: <input type="text" name="name" /> <br/> <br/>
+  {% endfor %}
+{% endif %}
 
 <form action="/display" method="post">
-<input type="submit" value="Cancel"/>
+  <input type="submit" value="Cancel"/>
 </form>
 
 <!-- if g.x is defined, display top marks for meetings + warning to user that they may need to refresh the page to see results -->

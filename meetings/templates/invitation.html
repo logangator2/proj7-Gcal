@@ -44,11 +44,24 @@
 <input type="hidden" name="invite" value="{{ g.invitation }}"></input>
 
 {% if g.invite_num is number %}
-
+<!-- if x is defined, used for updating stuff -->
   Please enter a name for each person you would like to invite. <br/> <br/>
   {% for i in range(g.invite_num) %}
     Enter a name: <input type="text" name="names" /> <br/> <br/>
   {% endfor %}
+  <form action="/invitation" method="post">
+  <input type="submit" value="Generate URLs"/>
+  </form>
+{% endif %}
+
+{% if g.names is defined %}
+  {% for name in g.names %}
+    URL for {{ name }}: x <br/> <br/>
+  {% endfor %}
+  Please copy and paste the corresponding url into an email to each corresponding invitee. <br/> <br/>
+  <!-- {% for name in g.urls %}
+    URL for {{ name }}: x <br/> <br/>
+  {% endfor %} -->
 {% endif %}
 
 </form>

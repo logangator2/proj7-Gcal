@@ -78,7 +78,11 @@ def invitation():
   flask.g.invitation = invitation
   if request.form.get("invite_num") != None:
     flask.g.invite_num = int(request.form.get("invite_num"))
-  #flask.g.names = request.form.getlist("names")
+  flask.g.names = request.form.getlist("names")
+  flask.g.urls = []
+  for name in flask.g.names:
+    flask.g.urls.append(url_for("index") + "/" + name)
+
   return render_template(invitation)
 
 """
@@ -155,6 +159,8 @@ def display():
   flask.g.events = busy_list # busy times within datetime range
   flask.g.free = free_list # free times within datetime range
   return render_template('index.html')
+
+
 
 ####
 #

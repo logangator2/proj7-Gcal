@@ -147,6 +147,11 @@ def display():
                     })
   busy_list = within_time(busy_list, ar_dict["begin_date"], ar_dict["end_date"])
   free_list = freemaker(busy_list, ar_dict["begin_date"], ar_dict["end_date"])
+  tb_list = []
+  for event in busy_list:
+    tb = timeblock.Timeblock(event["Summary"], event["Start Time"], event["End Time"])
+    tb_list.append(tb)
+  busy_list = tb_list
   flask.g.events = busy_list # busy times within datetime range
   flask.g.free = free_list # free times within datetime range
   return render_template('index.html')

@@ -106,17 +106,18 @@
   </div> <div class="row">
          {% endif %}
   {% endfor %}
-  <br /><input type="submit" value="Display" />
   </div>
+  <br/><input type="submit" value="Display"/>
 {% endif %}
 </form>
+<br/>
 
 <!-- Display busy times for each calendar if that calendar was selected -->
 {% if g.checked is defined %}
   Busy Times: <br/> <br/>
   {% for event in g.events %}
     {{ event }} <br/> <br/>
-  {% endfor %}
+  {% endfor %} <br/>
   Free Times: <br/> <br/>
   <form action="/invitation" name="freeblocks" method="POST">
   {% for event in g.free %}

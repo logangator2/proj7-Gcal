@@ -160,7 +160,10 @@ def display():
   flask.g.free = free_list # free times within datetime range
   return render_template('index.html')
 
-
+@app.errorhandler(404)
+def error_404(e):
+    app.logger.warning("++ 404 error: {}".format(e))
+    return flask.render_template('404.html'), 404
 
 ####
 #

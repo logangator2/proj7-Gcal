@@ -76,8 +76,9 @@ def invitation():
   flask.g.freeblocks = request.form.getlist("freeblocks")
   invitation = flask.request.form.get("invite")
   flask.g.invitation = invitation
-  flask.g.invite_num = request.form.get("invite_num")
-  app.logger.debug(flask.g.invite_num)
+  if request.form.get("invite_num") != None:
+    flask.g.invite_num = int(request.form.get("invite_num"))
+  #flask.g.names = request.form.getlist("names")
   return render_template(invitation)
 
 """

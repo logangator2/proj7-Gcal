@@ -17,13 +17,14 @@
 
 <h1>Meeting Invitation</h1>
 
-<h2>Selected Free Times:</h2>
-{% for freeblock in g.freeblocks %}
-    {{ freeblock }} <br/> <br/>
-{% endfor %}
+<form action="/invitation" method="post">
+  <h2>Selected Free Times:</h2>
+  <input type="hidden" name="freeblocks" value="{{ g.freeblocks }}"></input>
+  {% for freeblock in g.freeblocks %}
+      {{ freeblock }} <br/> <br/>
+  {% endfor %}
 
 <!-- Select how many ppl to invite, then bring up textboxes to enter names -->
-<form action="/invitation" method="post">
   Enter the number of people you wish to invite: 
   <select name="invite_num" value=1>
     <option value=1>1</option>
@@ -37,19 +38,20 @@
     <option value=9>9</option>
     <option value=10>10</option>
   </select>
-  <!-- <input type="text" name="invite_num" value="0"> -->
-  <input type="submit" value="Submit"/>
+  <input type="submit" value="Submit"/> <br/> <br/>
 
   <!-- Hidden field from index.html, used for refreshing page -->
 <input type="hidden" name="invite" value="{{ g.invitation }}"></input>
-</form>
 
 {% if g.invite_num is number %}
+
   Please enter a name for each person you would like to invite. <br/> <br/>
   {% for i in range(g.invite_num) %}
-    Enter a name: <input type="text" name="name" /> <br/> <br/>
+    Enter a name: <input type="text" name="names" /> <br/> <br/>
   {% endfor %}
 {% endif %}
+
+</form>
 
 <form action="/display" method="post">
   <input type="submit" value="Cancel"/>

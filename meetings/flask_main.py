@@ -144,12 +144,15 @@ def display():
   flask.g.memo1 = get_memos(0)
   flask.g.memo2 = get_memos(1)
   flask.g.memo3 = get_memos(2)
+  #mcode = random.randint(1, 100000)
 
   # For comparison
   daterange = flask.session['daterange']
   timerange = flask.session['timerange']
   ar_dict = arrowizer(timerange, daterange)
   # Example: ar_dict = "begin_date": "2017-11-18T09:00:00-08:00", "end_date": "2017-11-24T17:00:00-08:00"
+
+  #add_ranges(daterange, timerange, mcode)
 
   # Getting Google credentials and calendar
   credentials = valid_credentials()
@@ -584,32 +587,24 @@ def get_memos(num):
         records.append(record)
     return records 
 
-def add_memo(num):
+def add_ranges(daterange, timerange):
   """
-  Adds a memo based on the number entered.
-  Args:
-    num: 0-2 that designates which collection it goes to
-    0 goes to hashcodes
-    1 goes to startendtimes
-    2+ or < 0 goes to timeblocks
+  Adds daterange and timerange to the database for the meeting
   """
-  if num == 0: # Hashcodes
-    record = { "date":  arrow.utcnow().naive,
-           "text": memo,
-           "token": "sampletoken{}".format(tokencounter)
+  record = { "daterange": daterange,
+           "timerange": timerange
           }
-    collection0.insert(record)
-  if num == 1: # Date and Time ranges
-    record = { "date":  arrow.utcnow().naive,
-           "text": memo,
-           "token": "sampletoken{}".format(tokencounter)
-          }
-    collection1.insert(record)
-  else: # Timeblocks
-    record = { "date":  arrow.utcnow().naive,
-           "text": memo,
-           "token": "sampletoken{}".format(tokencounter)
-          }
+  collection1.insert(record)
+  return
+
+def add_timeblocks(timeblock_list):
+  """
+  Adds daterange and timerange to the database for the meeting
+  """
+  for timeblock in timeblock_list:
+    record = { "daterange": daterange,
+             "timerange": timerange
+            }
     collection2.insert(record)
   return
 

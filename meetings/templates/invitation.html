@@ -13,6 +13,8 @@
      src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
 </script>
 
+<title> Meeting Maker </title>
+
 <body>
 
 <h1>Meeting Invitation</h1>
@@ -55,13 +57,10 @@
 {% endif %}
 
 {% if g.names is defined %}
-  {% for name in g.names %}
-    URL for {{ name }}: x <br/> <br/>
-  {% endfor %}
   Please copy and paste the corresponding url into an email to each corresponding invitee. <br/> <br/>
-  <!-- {% for name in g.urls %}
-    URL for {{ name }}: x <br/> <br/>
-  {% endfor %} -->
+  {% for url in g.urls %}
+    {{ url }} <br/> <br/>
+  {% endfor %}
 {% endif %}
 
 </form>

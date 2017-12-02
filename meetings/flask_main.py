@@ -81,15 +81,13 @@ def invitation():
   flask.g.names = request.form.getlist("names")
   flask.g.urls = []
   for name in flask.g.names:
-    flask.g.urls.append(url_for("index") + "/" + name)
-
+    flask.g.urls.append(url_for("invitation", _external=True) + "/" + name)
   return render_template(invitation)
 
-"""
 @app.route("/invitation/<token>")
-def x(token):
-  return 
-"""
+def invite(token):
+  flask.g.token = token
+  return render_template("index.html")
 
 @app.route("/display", methods=['POST'])
 def display():

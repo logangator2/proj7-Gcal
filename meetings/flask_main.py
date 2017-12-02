@@ -19,6 +19,10 @@ import httplib2   # used in oauth2 flow
 # Google API for services 
 from apiclient import discovery
 
+# Mongo database
+import pymongo
+from pymongo import MongoClient
+
 # My modules
 import timeblock
 from free import freemaker
@@ -40,6 +44,24 @@ app.secret_key=CONFIG.SECRET_KEY
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = CONFIG.GOOGLE_KEY_FILE  ## You'll need this
 APPLICATION_NAME = 'MeetMe class project'
+
+MONGO_CLIENT_URL = "mongodb://{}:{}@{}:{}/{}".format(
+    CONFIG.DB_USER,
+    CONFIG.DB_USER_PW,
+    CONFIG.DB_HOST, 
+    CONFIG.DB_PORT, 
+    CONFIG.DB)
+
+try: 
+    dbclient = MongoClient(MONGO_CLIENT_URL)
+    db = getattr(dbclient, CONFIG.DB)
+    collection0 = db.hashcodes
+    collection1 = db.startendtimes
+    collection2 = db.timeblocks
+
+except:
+    print("Failure opening database.  Is Mongo running? Correct password?")
+    sys.exit(1)
 
 #############################
 #
@@ -71,22 +93,36 @@ def choose():
     flask.g.calendars = list_calendars(gcal_service)
     return render_template('index.html')
 
+# Invitation page
 @app.route("/invitation", methods=["POST"])
 def invitation():
+
+  # Hidden Forms
   flask.g.freeblocks = request.form.getlist("freeblocks")
   invitation = flask.request.form.get("invite")
   flask.g.invitation = invitation
   if request.form.get("invite_num") != None:
     flask.g.invite_num = int(request.form.get("invite_num"))
+
   flask.g.names = request.form.getlist("names")
   flask.g.urls = []
   for name in flask.g.names:
     flask.g.urls.append(url_for("invitation", _external=True) + "/" + name)
+
+  # Accessing the database
+  flask.g.memo1 = get_memos(0)
+  flask.g.memo2 = get_memos(1)
+  flask.g.memo3 = get_memos(2)
+
   return render_template(invitation)
 
+# For invited users
 @app.route("/invitation/<token>")
 def invite(token):
   flask.g.token = token
+  # This really needs to do most of what is in display
+
+  # Google Auth
   app.logger.debug("Checking credentials for Google calendar access")
   credentials = valid_credentials()
   if not credentials:
@@ -96,6 +132,7 @@ def invite(token):
   gcal_service = get_gcal_service(credentials)
   app.logger.debug("Returned from get_gcal_service")
   flask.g.calendars = list_calendars(gcal_service)
+
   return render_template("invitee.html")
 
 @app.route("/display", methods=['POST'])
@@ -103,6 +140,11 @@ def display():
   """
   Displays busy time events
   """
+  # Accessing the database to hold data for invitations
+  flask.g.memo1 = get_memos(0)
+  flask.g.memo2 = get_memos(1)
+  flask.g.memo3 = get_memos(2)
+
   # For comparison
   daterange = flask.session['daterange']
   timerange = flask.session['timerange']
@@ -119,7 +161,7 @@ def display():
   # Grabs events in selected calendars
   flask.g.checked = request.form.getlist("calendarcheck")
 
-  # Algorith for displayign results
+  # Algorithm for displaying results
   busy_list = []
   for calendar in flask.g.checked:
     for cal in flask.g.calendars:
@@ -513,6 +555,63 @@ def cal_sort_key( cal ):
     else:
        primary_key = "X"
     return (primary_key, selected_key, cal["summary"])
+
+def get_memos(num):
+    """
+    Returns all memos in the database, in a form that
+    can be inserted directly in the 'session' object.
+    Args:
+      num: 0-2 that designates which collection it goes to
+    0 goes to hashcodes
+    1 goes to startendtimes
+    2+ or < 0 goes to timeblocks
+    """
+    records = [ ]
+    if num == 0:
+      for record in collection0.find( { "type": "dated_memo" } ):
+        record['date'] = arrow.get(record['date']).isoformat()
+        del record['_id']
+        records.append(record)
+    if num == 1:
+      for record in collection1.find( { "type": "dated_memo" } ):
+        record['date'] = arrow.get(record['date']).isoformat()
+        del record['_id']
+        records.append(record)
+    else:
+      for record in collection2.find( { "type": "dated_memo" } ):
+        record['date'] = arrow.get(record['date']).isoformat()
+        del record['_id']
+        records.append(record)
+    return records 
+
+def add_memo(num):
+  """
+  Adds a memo based on the number entered.
+  Args:
+    num: 0-2 that designates which collection it goes to
+    0 goes to hashcodes
+    1 goes to startendtimes
+    2+ or < 0 goes to timeblocks
+  """
+  if num == 0: # Hashcodes
+    record = { "date":  arrow.utcnow().naive,
+           "text": memo,
+           "token": "sampletoken{}".format(tokencounter)
+          }
+    collection0.insert(record)
+  if num == 1: # Date and Time ranges
+    record = { "date":  arrow.utcnow().naive,
+           "text": memo,
+           "token": "sampletoken{}".format(tokencounter)
+          }
+    collection1.insert(record)
+  else: # Timeblocks
+    record = { "date":  arrow.utcnow().naive,
+           "text": memo,
+           "token": "sampletoken{}".format(tokencounter)
+          }
+    collection2.insert(record)
+  return
 
 #################
 #

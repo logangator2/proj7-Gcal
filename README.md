@@ -15,7 +15,9 @@ calendar) and list 'blocking'  (non-transparent)
 appointments between a start date and an end date
 for some subset of them. Displays busy times and free times within
 the designated date and time ranges. Allows the user to set up a 
-meeting and generates urls for invitees.
+meeting and generates urls for invitees. Invitees are redirected to 
+a modified version of the starting page, which allows them to compare 
+their calendar to the selected meeting times.
 
 ## Credits
 

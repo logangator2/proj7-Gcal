@@ -66,3 +66,4 @@ docs/_build/
 # PyBuilder
 target/
 meetings/google_client_key.json
+*.ini
